@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票交易记录</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>股票交易记录</h1>
+
+    <form id="transaction-form" method="POST" action="/add_transaction">
+        <label for="date">日期:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <label for="stock_code">公司代码:</label>
+        <input type="text" id="stock_code" name="stock_code" oninput="fetchStockData()" required><br>
+
+        <label for="stock_name">公司简称:</label>
+        <input type="text" id="stock_name" name="stock_name" required><br>
+
+        <label for="buy_price">买入价格:</label>
+        <input type="number" step="0.01" id="buy_price" name="buy_price"><br>
+
+        <label for="sell_price">卖出价格:</label>
+        <input type="number" step="0.01" id="sell_price" name="sell_price"><br>
+
+        <label for="daily_profit">当日收益:</label>
+        <input type="number" step="0.01" id="daily_profit" name="daily_profit" readonly><br>
+
+        <label for="final_profit">最终收益:</label>
+        <input type="number" step="0.01" id="final_profit" name="final_profit" readonly><br>
+
+        <label for="remarks">备注:</label>
+        <textarea id="remarks" name="remarks"></textarea><br>
+
+        <button type="submit">提交</button>
+    </form>
+
+    <h2>历史交易记录</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>日期</th>
+                <th>公司代码</th>
+                <th>公司简称</th>
+                <th>买入价格</th>
+                <th>卖出价格</th>
+                <th>当日涨幅</th>
+                <th>收盘价</th>
+                <th>当日收益</th>
+                <th>最终收益</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.date }}</td>
+                <td>{{ transaction.stock_code }}</td>
+                <td>{{ transaction.stock_name }}</td>
+                <td>{{ transaction.buy_price }}</td>
+                <td>{{ transaction.sell_price }}</td>
+                <td>{{ transaction.daily_change * 100 if transaction.daily_change else '' }}%</td>
+                <td>{{ transaction.close_price }}</td>
+                <td>{{ transaction.daily_profit }}</td>
+                <td>{{ transaction.final_profit }}</td>
+                <td>{{ transaction.remarks }}</td>
+                <td>
+                    <form action="{{ url_for('delete_transaction', id=transaction.id) }}" method="POST" onsubmit="return confirm('确定要删除这条记录吗？')">
+                        <button type="submit">删除</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
